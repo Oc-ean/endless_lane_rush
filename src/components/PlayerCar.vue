@@ -10,20 +10,28 @@ const laneX = computed(() => game.laneOffsets[game.lane])
 
 <template>
   <div
-    class="absolute w-[24%] max-w-[92px] transition-[left] duration-200 ease-out"
-    :class="[game.isJumping ? 'z-20 scale-110 drop-shadow-[0_18px_14px_rgba(0,0,0,0.55)]' : 'z-10 drop-shadow-[0_6px_6px_rgba(0,0,0,0.35)]']"
+    class="absolute w-[17%] max-w-[58px] transition-[left] duration-200 ease-out z-10"
+    :class="{ 'z-20': game.isJumping }"
     :style="{
       left: `${laneX}%`,
       bottom: '14%',
-      transform: `translateX(-50%) ${game.isJumping ? 'scale(1.12)' : 'scale(1)'}`,
-      transition: 'left 0.2s ease-out, transform 0.25s ease-out'
+      transform: 'translateX(-50%)'
     }"
   >
+    <div
+      class="absolute left-1/2 bottom-[6%] h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/50 blur-[2px]"
+      :class="game.isJumping ? 'animate-jump-shadow' : ''"
+    ></div>
+
     <img
+      :key="game.isJumping ? 'jumping' : 'grounded'"
       :src="carImg"
       alt="Player car"
-      class="w-full select-none pointer-events-none"
-      :class="{ 'animate-float-y': game.isJumping, 'grayscale opacity-70 rotate-6': game.isGameOver }"
+      class="relative w-full select-none pointer-events-none drop-shadow-[0_6px_6px_rgba(0,0,0,0.35)]"
+      :class="{
+        'animate-car-jump drop-shadow-[0_28px_16px_rgba(0,0,0,0.5)]': game.isJumping,
+        'grayscale opacity-70 rotate-6': game.isGameOver
+      }"
       draggable="false"
     />
   </div>

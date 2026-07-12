@@ -12,7 +12,7 @@ const laneX = computed(() => game.laneOffsets[props.obstacle.lane])
 
 <template>
   <div
-    class="absolute w-[24%] max-w-[92px] z-10"
+    class="absolute w-[17%] max-w-[58px] z-10"
     :style="{
       left: `${laneX}%`,
       top: `${obstacle.y}%`,
