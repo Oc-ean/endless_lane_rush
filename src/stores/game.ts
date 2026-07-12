@@ -13,8 +13,8 @@ const MIN_SPAWN_INTERVAL = 0.45;
 const SPAWN_INTERVAL_DECAY = 0.006;
 const JUMP_DURATION = 0.85;
 const JUMP_LANDING_GRACE = 0.18;
-const COLLISION_ZONE = [72, 94] as const;
-
+const MILESTONE_SCORE = 100;
+const MILESTONE_SPEED_BOOST = 8;
 let obstacleUid = 0;
 
 export const useGameStore = defineStore("game", {
@@ -27,6 +27,9 @@ export const useGameStore = defineStore("game", {
     distance: 0,
     elapsed: 0,
     speed: BASE_SPEED,
+    milestoneBonus: 0,
+    milestonesReached: 0,
+    lastBoostAt: -Infinity,
     spawnInterval: BASE_SPAWN_INTERVAL,
     obstacleTimer: 0,
     isJumping: false,
@@ -57,6 +60,10 @@ export const useGameStore = defineStore("game", {
       this.distance = 0;
       this.elapsed = 0;
       this.speed = BASE_SPEED;
+      this.milestoneBonus = 0;
+      this.milestonesReached = 0;
+      this.lastBoostAt = -Infinity;
+
       this.spawnInterval = BASE_SPAWN_INTERVAL;
       this.obstacleTimer = 0;
       this.isJumping = false;
@@ -92,9 +99,17 @@ export const useGameStore = defineStore("game", {
       const step = Math.min(dt, 0.05);
 
       this.elapsed += step;
+
+      const milestone = Math.floor(this.score / MILESTONE_SCORE);
+      if (milestone > this.milestonesReached) {
+        this.milestonesReached = milestone;
+        this.milestoneBonus += MILESTONE_SPEED_BOOST;
+        this.lastBoostAt = this.elapsed;
+      }
+
       this.speed = Math.min(
         MAX_SPEED,
-        BASE_SPEED + this.elapsed * ACCELERATION_PER_SEC,
+        BASE_SPEED + this.elapsed * ACCELERATION_PER_SEC + this.milestoneBonus,
       );
       this.spawnInterval = Math.max(
         MIN_SPAWN_INTERVAL,
@@ -107,7 +122,6 @@ export const useGameStore = defineStore("game", {
       for (const obstacle of this.obstacles) {
         obstacle.y += this.speed * step;
       }
-
       this.obstacles = this.obstacles.filter((o) => o.y < 115);
 
       this.obstacleTimer += step;
@@ -125,22 +139,6 @@ export const useGameStore = defineStore("game", {
       } else if (this.landingGrace > 0) {
         this.landingGrace = Math.max(0, this.landingGrace - step);
       }
-
-      this.checkCollisions();
-    },
-
-    checkCollisions() {
-      if (this.isJumping || this.landingGrace > 0) return;
-      for (const obstacle of this.obstacles) {
-        if (
-          obstacle.lane === this.lane &&
-          obstacle.y >= COLLISION_ZONE[0] &&
-          obstacle.y <= COLLISION_ZONE[1]
-        ) {
-          this.endGame();
-          return;
-        }
-      }
     },
 
     pauseGame() {
@@ -151,6 +149,12 @@ export const useGameStore = defineStore("game", {
     resumeGame() {
       if (this.status !== "paused") return;
       this.status = "playing";
+    },
+
+    registerCollision() {
+      if (this.status !== "playing") return;
+      if (this.isJumping || this.landingGrace > 0) return;
+      this.endGame();
     },
 
     endGame() {
