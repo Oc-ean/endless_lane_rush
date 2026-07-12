@@ -1,42 +1,38 @@
-# endless_lane_rush
+# 🚗 Lane Rush — Endless Car Game
 
-This template should help get you started developing with Vue 3 in Vite.
+Lane Rush is a fast-paced endless lane runner game inspired by the nostalgic classic car games from the Nokia era. Your goal is to survive for as long as possible by dodging oncoming traffic, jumping over obstacles, and reaching new high scores as the game gradually becomes more challenging.
 
-## Recommended IDE Setup
+# 🎨 Design
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Design by Rose Ntuk
+[View on LinkedIn](https://www.linkedin.com/in/rose-ntuk-833866240/)
 
-## Recommended Browser Setup
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## 🛠️ Stack
+- Vue 3 (`<script setup>` + Composition API)
+- TypeScript
+- Pinia (game state & loop logic)
+- Vue Router (Home / Instructions / Game views)
+- Tailwind CSS 3.4.19
+- Vite
 
-## Type Support for `.vue` Imports in TS
+## 🚀 Getting started
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Open the printed local URL in your browser. On a phone, use your machine's LAN IP (Vite prints it with `--host`) to test touch controls.
 
-```sh
-npm run build
+```bash
+npm run build     # production build to dist/
+npm run preview   # preview the production build
+npm run type-check
 ```
+
+## 🕹️ Controls
+
+**Desktop:** Arrow Left / Arrow Right to change lanes, Space to jump, Escape or `P` to pause.
+**Mobile:** Swipe left / right to change lanes, swipe up or tap the car to jump. Use the pause button in the HUD to pause.
+
