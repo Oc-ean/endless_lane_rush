@@ -37,12 +37,26 @@ export default {
         'flash': {
           '0%, 100%': { opacity: 1 },
           '50%': { opacity: 0.4 }
+        },
+        'car-jump': {
+          '0%': { transform: 'translateY(0) scale(1)' },
+          '35%': { transform: 'translateY(-42px) scale(1.28)' },
+          '65%': { transform: 'translateY(-42px) scale(1.28)' },
+          '100%': { transform: 'translateY(0) scale(1)' }
+        },
+        'jump-shadow': {
+          '0%': { opacity: 0.55, transform: 'scaleX(1)' },
+          '35%': { opacity: 0.2, transform: 'scaleX(0.6)' },
+          '65%': { opacity: 0.2, transform: 'scaleX(0.6)' },
+          '100%': { opacity: 0.55, transform: 'scaleX(1)' }
         }
       },
       animation: {
         'stripe-scroll': 'stripe-scroll 0.6s linear infinite',
         'float-y': 'float-y 3s ease-in-out infinite',
-        'flash': 'flash 1.4s ease-in-out infinite'
+        'flash': 'flash 1.4s ease-in-out infinite',
+        'car-jump': 'car-jump 0.85s cubic-bezier(0.33,0,0.2,1) 1',
+        'jump-shadow': 'jump-shadow 0.85s cubic-bezier(0.33,0,0.2,1) 1'
       }
     }
   },
