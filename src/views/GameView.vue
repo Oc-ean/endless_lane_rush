@@ -7,6 +7,7 @@ import PlayerCar from '@/components/PlayerCar.vue'
 import ObstacleCar from '@/components/ObstacleCar.vue'
 import GameHud from '@/components/GameHud.vue'
 import GameOverModal from '@/components/GameOverModal.vue'
+import GamePauseModal from '@/components/GamePauseModal.vue'
 
 const game = useGameStore()
 useGameControls()
@@ -57,6 +58,8 @@ function handleCarTap() {
     </RoadBackground>
 
     <GameHud />
+        <GamePauseModal @restart="handleRestart" />
+
     <GameOverModal @restart="handleRestart" />
   </div>
 </template>
