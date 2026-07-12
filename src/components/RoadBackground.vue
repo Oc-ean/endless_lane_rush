@@ -18,15 +18,7 @@ defineProps<{
         :style="{
           backgroundImage: `url(${roadImg})`,
           backgroundSize: '100% auto',
-          transform: `translateY(${offset}px)`
-        }"
-      ></div>
-      <div
-        class="absolute inset-0 bg-repeat-y"
-        :style="{
-          backgroundImage: `url(${roadImg})`,
-          backgroundSize: '100% auto',
-          transform: `translateY(${offset - 1000}px)`
+          backgroundPosition: `center ${offset}px`
         }"
       ></div>
 
