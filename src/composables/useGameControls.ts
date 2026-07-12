@@ -63,8 +63,10 @@ export function useGameControls() {
     const absX = Math.abs(dx)
     const absY = Math.abs(dy)
 
-    // treat quick, short movement as a tap (handled elsewhere for jump-on-tap)
-    if (absX < 15 && absY < 15) return
+    if (absX < 15 && absY < 15) {
+      triggerJump()
+      return
+    }
 
     if (absX > absY && absX > SWIPE_THRESHOLD) {
       if (dx > 0) move('right')
@@ -73,7 +75,6 @@ export function useGameControls() {
       triggerJump()
     }
 
-    // guard against unused var lint
     void dt
   }
 
