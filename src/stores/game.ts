@@ -11,7 +11,8 @@ const ACCELERATION_PER_SEC = 0.35
 const BASE_SPAWN_INTERVAL = 1.15
 const MIN_SPAWN_INTERVAL = 0.45
 const SPAWN_INTERVAL_DECAY = 0.006
-const JUMP_DURATION = 0.7
+const JUMP_DURATION = 0.85
+const JUMP_LANDING_GRACE = 0.18
 const COLLISION_ZONE = [72, 94] as const
 
 let obstacleUid = 0
@@ -30,6 +31,7 @@ export const useGameStore = defineStore('game', {
     obstacleTimer: 0,
     isJumping: false,
     jumpTimer: 0,
+    landingGrace: 0,
     obstacles: [] as Obstacle[],
     justCrashed: false
   }),
@@ -55,6 +57,7 @@ export const useGameStore = defineStore('game', {
       this.obstacleTimer = 0
       this.isJumping = false
       this.jumpTimer = 0
+      this.landingGrace = 0
       this.obstacles = []
       this.justCrashed = false
     },
@@ -109,14 +112,17 @@ export const useGameStore = defineStore('game', {
         this.jumpTimer += step
         if (this.jumpTimer >= JUMP_DURATION) {
           this.isJumping = false
+          this.landingGrace = JUMP_LANDING_GRACE
         }
+      } else if (this.landingGrace > 0) {
+        this.landingGrace = Math.max(0, this.landingGrace - step)
       }
 
       this.checkCollisions()
     },
 
     checkCollisions() {
-      if (this.isJumping) return
+      if (this.isJumping || this.landingGrace > 0) return
       for (const obstacle of this.obstacles) {
         if (
           obstacle.lane === this.lane &&
@@ -144,6 +150,8 @@ export const useGameStore = defineStore('game', {
       this.obstacles = []
       this.score = 0
       this.justCrashed = false
+      this.isJumping = false
+      this.landingGrace = 0
     }
   }
 })
