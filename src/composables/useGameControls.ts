@@ -1,5 +1,6 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/game'
+import { playJump, playLaneChange, primeAudio } from '@/composables/useSounds'
 
 const SWIPE_THRESHOLD = 40
 
@@ -10,24 +11,44 @@ export function useGameControls() {
   let touchStartY = 0
   let touchStartTime = 0
 
+  function move(direction: 'left' | 'right') {
+    const before = game.lane
+    if (direction === 'left') game.moveLeft()
+    else game.moveRight()
+    if (game.lane !== before) playLaneChange()
+  }
+
+  function triggerJump() {
+    const wasJumping = game.isJumping
+    game.jump()
+    if (!wasJumping && game.isJumping) playJump()
+  }
+
   function handleKeydown(e: KeyboardEvent) {
+    primeAudio()
     switch (e.code) {
       case 'ArrowLeft':
         e.preventDefault()
-        game.moveLeft()
+        move('left')
         break
       case 'ArrowRight':
         e.preventDefault()
-        game.moveRight()
+        move('right')
         break
       case 'Space':
         e.preventDefault()
-        game.jump()
+        triggerJump()
+        break
+      case 'Escape':
+      case 'KeyP':
+        e.preventDefault()
+        game.pauseGame()
         break
     }
   }
 
   function handleTouchStart(e: TouchEvent) {
+    primeAudio()
     const touch = e.touches[0]!
     touchStartX = touch.clientX
     touchStartY = touch.clientY
@@ -42,15 +63,17 @@ export function useGameControls() {
     const absX = Math.abs(dx)
     const absY = Math.abs(dy)
 
+    // treat quick, short movement as a tap (handled elsewhere for jump-on-tap)
     if (absX < 15 && absY < 15) return
 
     if (absX > absY && absX > SWIPE_THRESHOLD) {
-      if (dx > 0) game.moveRight()
-      else game.moveLeft()
+      if (dx > 0) move('right')
+      else move('left')
     } else if (absY > SWIPE_THRESHOLD && dy < 0) {
-      game.jump()
+      triggerJump()
     }
 
+    // guard against unused var lint
     void dt
   }
 

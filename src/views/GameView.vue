@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useGameControls } from '@/composables/useGameControls'
 import RoadBackground from '@/components/RoadBackground.vue'
@@ -8,7 +8,16 @@ import ObstacleCar from '@/components/ObstacleCar.vue'
 import GameHud from '@/components/GameHud.vue'
 import GameOverModal from '@/components/GameOverModal.vue'
 import GamePauseModal from '@/components/GamePauseModal.vue'
-
+import {
+  primeAudio,
+  playJump,
+  playCrash,
+  playGameOverJingle,
+  playMilestone,
+  startEngine,
+  stopEngine,
+  updateEngine
+} from '@/composables/useSounds'
 
 const PLAYER_HITBOX_INSET = 0.24
 const OBSTACLE_HITBOX_INSET = 0.22
@@ -93,7 +102,31 @@ function handleRestart() {
   game.startGame()
 }
 
+
+watch(
+  () => game.status,
+  (status, prevStatus) => {
+    if (status === 'gameover' && prevStatus !== 'gameover') {
+      stopEngine()
+      playCrash()
+      setTimeout(() => playGameOverJingle(), 320)
+    } else if (status === 'paused') {
+      stopEngine()
+    } else if (status === 'playing' && prevStatus !== 'playing') {
+      startEngine()
+    }
+  }
+)
+
+watch(
+  () => game.milestonesReached,
+  (value, prev) => {
+    if (value > prev) playMilestone()
+  }
+)
+
 onMounted(() => {
+  primeAudio()
   game.startGame()
   rafId = requestAnimationFrame(loop)
 })

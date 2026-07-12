@@ -13,7 +13,8 @@ function goHome() {
 const desktopControls = [
   { key: '←', action: 'Move one lane left' },
   { key: '→', action: 'Move one lane right' },
-  { key: 'Space', action: 'Jump over obstacles' }
+  { key: 'Space', action: 'Jump over obstacles' },
+  { key: 'Esc', action: 'Pause game' }
 ]
 
 const mobileControls = [
