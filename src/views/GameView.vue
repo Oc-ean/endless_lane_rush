@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useGameStore } from '@/stores/game'
+import { useGameStore, BASE_SPEED, MAX_SPEED } from '@/stores/game'
 import { useGameControls } from '@/composables/useGameControls'
-import RoadBackground from '@/components/RoadBackground.vue'
-import PlayerCar from '@/components/PlayerCar.vue'
-import ObstacleCar from '@/components/ObstacleCar.vue'
-import GameHud from '@/components/GameHud.vue'
-import GameOverModal from '@/components/GameOverModal.vue'
-import GamePauseModal from '@/components/GamePauseModal.vue'
 import {
   primeAudio,
   playJump,
@@ -18,9 +12,16 @@ import {
   stopEngine,
   updateEngine
 } from '@/composables/useSounds'
+import RoadBackground from '@/components/RoadBackground.vue'
+import PlayerCar from '@/components/PlayerCar.vue'
+import ObstacleCar from '@/components/ObstacleCar.vue'
+import GameHud from '@/components/GameHud.vue'
+import GameOverModal from '@/components/GameOverModal.vue'
+import GamePauseModal from '@/components/GamePauseModal.vue'
 
-const PLAYER_HITBOX_INSET = 0.24
-const OBSTACLE_HITBOX_INSET = 0.22
+
+const PLAYER_HITBOX_INSET = { left: 0.07, right: 0.08, top: 0.07, bottom: 0.08 }
+const OBSTACLE_HITBOX_INSET = { left: 0.18, right: 0.12, top: 0.09, bottom: 0.08 }
 
 const game = useGameStore()
 useGameControls()
@@ -42,14 +43,19 @@ function setObstacleRef(id: number, el: unknown) {
   if (domEl instanceof HTMLElement) obstacleEls.set(id, domEl)
 }
 
-function shrinkRect(rect: DOMRect, inset: number) {
-  const dx = rect.width * inset
-  const dy = rect.height * inset
+interface SideInsets {
+  left: number
+  right: number
+  top: number
+  bottom: number
+}
+
+function shrinkRect(rect: DOMRect, inset: SideInsets) {
   return {
-    left: rect.left + dx,
-    right: rect.right - dx,
-    top: rect.top + dy,
-    bottom: rect.bottom - dy
+    left: rect.left + rect.width * inset.left,
+    right: rect.right - rect.width * inset.right,
+    top: rect.top + rect.height * inset.top,
+    bottom: rect.bottom - rect.height * inset.bottom
   }
 }
 
@@ -92,6 +98,7 @@ function loop(timestamp: number) {
     game.tick(dt)
     roadOffset.value += game.speed * dt * 4
     checkPixelCollisions()
+    updateEngine((game.speed - BASE_SPEED) / (MAX_SPEED - BASE_SPEED))
   }
 
   rafId = requestAnimationFrame(loop)
@@ -101,7 +108,6 @@ function handleRestart() {
   roadOffset.value = 0
   game.startGame()
 }
-
 
 watch(
   () => game.status,
@@ -128,15 +134,19 @@ watch(
 onMounted(() => {
   primeAudio()
   game.startGame()
+  startEngine()
   rafId = requestAnimationFrame(loop)
 })
 
 onBeforeUnmount(() => {
   cancelAnimationFrame(rafId)
+  stopEngine()
 })
 
 function handleCarTap() {
+  const wasJumping = game.isJumping
   game.jump()
+  if (!wasJumping && game.isJumping) playJump()
 }
 </script>
 
